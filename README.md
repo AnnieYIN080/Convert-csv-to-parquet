@@ -11,6 +11,7 @@ Conversion method choice depends heavily on **file size** and **computational en
 
 
 1. Medium Scale: Pandas/PyArrow (In-Memory)
+`pip install pandas s3fs pyarrow`
 This method is ideal when the entire CSV file fits comfortably in your machine's RAM. (Suitable for Single Machine)<br>
 
 If your file is large (e.g., up to a few GBs) but small enough to fit within the memory limits of a single powerful machine (like a high-end EC2 instance), you can use the Pandas ecosystem enhanced by PyArrow.<br>
@@ -19,10 +20,11 @@ PyArrow is the underlying engine for Parquet files and is much faster than tradi
 
 
 2. Large Scale: Dask (Out-of-Core Processing)
+`pip install dask[dataframe] s3fs pyarrow`
 Dask is excellent for files too large for a single machine's memory, as it automatically breaks the data into chunks, processes them in parallel, and manages memory usage.
 
 
-3. Massive Scale: PySpark / AWS Glue (Distributed Computing)<br>
+4. Massive Scale: PySpark / AWS Glue (Distributed Computing)<br>
 For true petabyte-scale data, a horizontally scalable cluster framework is required.<br>
 
 3.1 PySpark (AWS EMR / Databricks)<br>
