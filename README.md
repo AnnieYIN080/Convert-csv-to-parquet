@@ -19,10 +19,18 @@ If your file is large (e.g., up to a few GBs) but small enough to fit within the
 PyArrow is the underlying engine for Parquet files and is much faster than traditional Pandas I/O. For files slightly larger than memory, you can use an intermediate approach called Dask which utilizes PyArrow for chunked processing.<br>
 
 
-**2. Large Scale: Dask (Out-of-Core Processing)<br>**
-`pip install dask[dataframe] s3fs pyarrow`<br>
-Dask is excellent for files too large for a single machine's memory, as it automatically breaks the data into chunks, processes them in parallel, and manages memory usage.<br>
+**2. Large Scale: Out-of-Core Processing (Single Node)<br>**
+These methods efficiently utilize a single powerful machine's CPU cores and disk I/O, streaming the data without loading the full dataset into RAM at once.<br>
 
+**2.1 Dask (Out-of-Core Processing & Parallelism)<br>**
+`pip install dask[dataframe] s3fs pyarrow`<br>
+Dask breaks the large file into many smaller pandas DataFrames (partitions), processes them in parallel across your available CPU cores, and manages the execution graph. This allows for processing files much larger than RAM.<br>
+
+**2.2 DuckDB (Streaming Conversion via SQL)** <br>
+`pip install duckdb s3fs pyarrow`<br>
+DuckDB is a high-performance in-process analytical data management system. By using its SQL interface, we can instruct DuckDB to read the CSV file from S3 and write the Parquet file directly.<br>
+
+DuckDB excels here because it performs the conversion using a streaming process. It does not materialize the entire intermediate result into a single DataFrame in Python's memory. Instead, it processes chunks of data efficiently and streams them out, offering high performance with minimal memory overhead.<br>
 
 **3. Massive Scale: PySpark / AWS Glue (Distributed Computing)<br>**
 For true petabyte-scale data, a horizontally scalable cluster framework is required.<br>
