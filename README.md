@@ -32,6 +32,21 @@ DuckDB is a high-performance in-process analytical data management system. By us
 
 DuckDB excels here because it performs the conversion using a streaming process. It does not materialize the entire intermediate result into a single DataFrame in Python's memory. Instead, it processes chunks of data efficiently and streams them out, offering high performance with minimal memory overhead.<br>
 
+**2.3 Polars (Lazy Evaluation & Multithreaded Optimization)<br>**
+
+`pip install polars s3fs` <br>
+
+Polars is a blazingly fast DataFrame library written in Rust, which offers exceptional performance on modern hardware. It uses a Lazy Evaluation strategy via pl.scan_csv() which is crucial for large files.<br>
+
+When processing large files, Polars:<br>
+
+- Lazy Evaluation: It does not read the file until explicitly asked to do so (.collect() or .write_parquet()). It builds an optimized execution plan first.<br>
+
+- Streaming: It reads the large file in chunks and pipelines the computation (filtering, selecting) directly to the output, effectively streaming the result without loading the full dataset into RAM.<br>
+
+- Multithreaded: Operations are automatically parallelized across all available CPU cores, maximizing single-node performance for column-oriented operations.<br>
+
+
 **3. Massive Scale: PySpark / AWS Glue (Distributed Computing)<br>**
 For true petabyte-scale data, a horizontally scalable cluster framework is required.<br>
 
