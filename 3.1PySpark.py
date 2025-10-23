@@ -17,9 +17,15 @@ df = spark.read.csv(
     # sep=','
 )
 
+# Optional: Show a few rows and schema to verify
+df.show()
+df.printSchema()
+
 # 4. Write the DataFrame to Parquet format in S3
-# Spark automatically partitions the Parquet output into multiple files 
-# for efficient retrieval.
+# Spark automatically partitions the Parquet output into multiple files for efficient retrieval.
+
+# df.write.mode("overwrite").parquet(parquet_output_path) # Overwrite if exists
+
 df.write.parquet(
     parquet_output_path, 
     mode="overwrite" # Change to "append" if necessary
