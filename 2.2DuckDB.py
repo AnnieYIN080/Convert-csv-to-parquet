@@ -17,6 +17,9 @@ try:
 
     # 3. SQL command to read CSV and write Parquet, partitioned
     # 'COPY ... TO' is the most efficient way to convert data in DuckDB.
+    
+    # con.execute(f"COPY (SELECT * FROM read_csv('{csv_input_path}', AUTO_DETECT=TRUE)) TO '{parquet_output_path}' (FORMAT PARQUET, COMPRESSION ZSTD);")
+
     con.sql(f"""
         COPY (
             SELECT *
@@ -26,7 +29,7 @@ try:
             FORMAT PARQUET,
             ROW_GROUP_SIZE 100000,
             PARTITION_BY year_column, -- Optional: Partition for better query performance later
-            OVERWRITE TRUE
+            OVERWRITE TRUE        -- Optional: in case already existed the parquet file with the same name
         );
     """)
     print(f"Successfully streamed CSV to partitioned Parquet files at: {parquet_output_path}")
