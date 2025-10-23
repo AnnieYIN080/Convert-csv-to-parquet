@@ -1,23 +1,32 @@
 # S3 CSV to Parquet Conversion Guide (Python) <br>
 This repository provides robust, scalable Python scripts to efficiently convert large CSV files stored in AWS S3 into the highly optimized Parquet format. <br>
 
+The conversion strategy is categorized based on scale, ensuring optimal performance and resource utilization for your specific dataset size. <br>
+
+## Conversion Strategy Overview
 Conversion method choice depends heavily on **file size** and **computational environment**.<br>
 
 | Method | Best For | Environment | Key Feature |
 | :--- | :--- | :--- | :--- |
-| **Pandas / PyArrow** | Small/Medium (up to a few GB) | Single powerful instance (e.g., EC2) | Fastest I/O for in-memory data. |
+| **Pandas / PyArrow** | Small/Medium (up to a few GB) | Single powerful instance (e.g., EC2) | Fastest I/O for **in-memory** data. |
 | **Dask** | Large (tens of GB, > RAM) | Single instance (powerful, high RAM) | Uses **out-of-core** processing (chunks) to handle files larger than memory. |
-| **PySpark / AWS Glue** | Massive (hundreds of GBs to TBs) | Distributed Cluster (AWS EMR, Databricks) | Handles true distributed computing and horizontal scaling. |
+| **DuckDB / Polars**	| Large (Disk I/O Bound) |	Single Powerful Instance (High RAM/CPU) |	**Streaming I/O** and **Multithreaded** execution minimize memory footprint while maximizing single-node performance. |
+| **PySpark / AWS Glue** | Massive (hundreds of GBs to TBs) | Distributed Cluster (AWS EMR, Databricks) | Handles true **distributed computing** and **horizontal scaling**. |
 
 
-**1. Medium Scale: Pandas/PyArrow (In-Memory)<br>**
-`pip install pandas s3fs pyarrow`<br>
-This method is ideal when the entire CSV file fits comfortably in your machine's RAM. (Suitable for Single Machine)<br>
+**1. Medium Scale: Pandas/PyArrow (In-Memory)<br>** 
 
-If your file is large (e.g., up to a few GBs) but small enough to fit within the memory limits of a single powerful machine (like a high-end EC2 instance), you can use the Pandas ecosystem enhanced by PyArrow.<br>
+This approach is ideal when the entire CSV file fits comfortably in your machine's RAM, prioritizing speed and low latency.
 
-PyArrow is the underlying engine for Parquet files and is much faster than traditional Pandas I/O. For files slightly larger than memory, you can use an intermediate approach called Dask which utilizes PyArrow for chunked processing.<br>
+**1.1 Pandas** <br>
+`pip install pandas s3fs pyarrow`
 
+This method leverages Pandas for its robust CSV reading and data manipulation features, then uses PyArrow as the optimized engine to perform the fast Parquet write. <br>
+
+**1.2 PyArrow Direct I/O** <br>
+`pip install s3fs pyarrow`
+
+This is the most efficient approach for in-memory conversion. By using pyarrow.csv.read_csv(), we bypass the Pandas DataFrame structure entirely, streaming the CSV data directly into the PyArrow columnar format. This eliminates intermediate memory copies and reduces overhead.<br>
 
 **2. Large Scale: Out-of-Core Processing (Single Node)<br>**
 These methods efficiently utilize a single powerful machine's CPU cores and disk I/O, streaming the data without loading the full dataset into RAM at once.<br>
